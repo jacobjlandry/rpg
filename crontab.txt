@@ -1,0 +1,1 @@
+0,30 * * * *       /usr/local/bin/php /var/www/artisan schedule:run >> /var/www/storage/logs/laravel.log 2>&1

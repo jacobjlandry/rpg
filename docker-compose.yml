@@ -62,6 +62,7 @@ services:
       - rpg
   mongo:
     image: mongo:5.0
+    command: mongod --port 27018
     restart: unless-stopped
     environment:
         MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}

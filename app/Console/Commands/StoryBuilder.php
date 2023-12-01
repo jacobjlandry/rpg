@@ -66,7 +66,7 @@ class StoryBuilder extends Command
 
     private function addLine()
     {
-        if($this->previousLine->choices() && $this->previousLine->choices()->count() > 0) {
+        if($this->previousLine !== 0 && $this->previousLine->choices()->count() > 0) {
             $this->info("Existing story lines");
             $this->previousLine->choices()->each(function($line) {
                 $this->info($line->text);

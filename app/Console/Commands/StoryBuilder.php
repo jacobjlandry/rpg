@@ -26,18 +26,17 @@ class StoryBuilder extends Command
     private $previousLine = 0; // delete 
     private $line:
     private $history;
-    private $options = ["Back", "Quit"];
-    private $storyOptions = ["New Story"];
-    private $lineOptions = ["New Line"];
+    private $storyOptions = ["New Story", "Quit"];
+    private $lineOptions = ["New Line", "Back", "Quit"];
     
     public function handle2() 
     {
         $choice = $this->choice(
             "Welcome, traveler!"
             array_merge(
-                $this->storyOptions,
+                array_splice($this->storyOptions,0, 1),
                 Story::all()->pluck("title")->toArray(),
-                $this->options,
+                array_splice($this->storyOptions, 1, 2),
             ),
             0
         );
@@ -52,9 +51,9 @@ class StoryBuilder extends Command
          $choice = $this->choice(
             "Welcome, traveler!"
             array_merge(
-                $this->lineOptions,
+                array_splice($this->lineOptions,0, 1)
                 $this->story->startingLines()->pluck("text")->toArray(),
-                $this->options,
+                array_splice($this->lineOptions,0, 2),
             ),
             0
         );

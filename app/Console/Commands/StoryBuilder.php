@@ -32,30 +32,32 @@ class StoryBuilder extends Command
     public function handle2() 
     {
         // story select
-        $choice = $this->choice(
-            "Welcome, traveler!"
-            array_merge(
-                array_splice($this->storyOptions,0, 1),
-                Story::all()->pluck("title")->toArray(),
-                array_splice($this->storyOptions, 1, 2),
-            ),
-            0
-        );
-        
-        $this->handleChoice($choice);
+        if!($this->story) {
+            $choice = $this->choice(
+                "Welcome, traveler!"
+                array_merge(
+                    array_splice($this->storyOptions,0, 1),
+                    Story::all()->pluck("title")->toArray(),
+                    array_splice($this->storyOptions, 1, 2),
+                ),
+                0
+            );
+            $this->handleChoice($choice);
+        }
         
         // line select 
-        $choice = $this->choice(
-            "Welcome, traveler!"
-            array_merge(
-                array_splice($this->lineOptions,0, 1)
-                $this->story->startingLines()->pluck("text")->toArray(),
-                array_splice($this->lineOptions,2, 2),
-            ),
-            0
-        );
-        
-        $this-handleChoice($choice);
+        if(!$this->line) {
+            $choice = $this->choice(
+                "Welcome, traveler!"
+                array_merge(
+                    array_splice($this->lineOptions,0, 1)
+                    $this->story->startingLines()->pluck("text")->toArray(),
+                    array_splice($this->lineOptions,2, 2),
+                ),
+                0
+            );
+            $this-handleChoice($choice);
+        }
         
         // line edit
         $choice = $this->choice(

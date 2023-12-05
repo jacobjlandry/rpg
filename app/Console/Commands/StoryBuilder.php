@@ -27,10 +27,11 @@ class StoryBuilder extends Command
     private $line;
     private $history;
     private $storyOptions = ["New Story", "Quit"];
-    private $lineOptions = ["New Line", "Back", "Quit"];
+    private $lineOptions = ["New Line", "Edit Line", "Back", "Quit"];
     
     public function handle2() 
     {
+        // story select
         $choice = $this->choice(
             "Welcome, traveler!"
             array_merge(
@@ -43,17 +44,34 @@ class StoryBuilder extends Command
         
         $this->handleChoice($choice);
         
-         $choice = $this->choice(
+        // line select 
+        $choice = $this->choice(
             "Welcome, traveler!"
             array_merge(
                 array_splice($this->lineOptions,0, 1)
                 $this->story->startingLines()->pluck("text")->toArray(),
-                array_splice($this->lineOptions,1, 2),
+                array_splice($this->lineOptions,2, 2),
             ),
             0
         );
         
         $this-handleChoice($choice);
+        
+        // line edit
+        $choice = $this->choice(
+            "Welcome, traveler!"
+            array_merge(
+                array_splice($this->lineOptions,0, 2)
+                $this->story->startingLines()->pluck("text")->toArray(),
+                array_splice($this->lineOptions,2, 2),
+            ),
+            0
+        );
+        
+        $this->handleChoice($choice);
+        
+        // todo: manage state so we can continue editing until quit
+        // todo: print story so far at each level
     }
     
     private function handleChoice($choice) {
@@ -66,6 +84,12 @@ class StoryBuilder extends Command
                 
             case "New Line":
                 $this->line = new StoryLine();
+                $this->line->text = $this->ask("What is the text for this line?")
+                $this->line->isEnd = $this->confirm("Is this the end of the story?");
+                $this->line->save();
+                break;
+                
+            case "Edit Line":
                 $this->line->text = $this->ask("What is the text for this line?")
                 $this->line->isEnd = $this->confirm("Is this the end of the story?");
                 $this->line->save();

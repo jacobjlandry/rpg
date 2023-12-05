@@ -43,39 +43,36 @@ class StoryBuilder extends Command
         
         $this->handleChoice($choice);
         
-        if(!$this->story->exists) {
-            $this->story->title = $this->ask("What is this storu called?");
-            $this->story->save();
-        }
-        
          $choice = $this->choice(
             "Welcome, traveler!"
             array_merge(
                 array_splice($this->lineOptions,0, 1)
                 $this->story->startingLines()->pluck("text")->toArray(),
-                array_splice($this->lineOptions,0, 2),
+                array_splice($this->lineOptions,1, 2),
             ),
             0
         );
         
         $this-handleChoice($choice);
-        
-        if(true) {
-            $this->line = $this->story->startingLines()->where("text", $choice)->first();
-        }
     }
     
     private function handleChoice($choice) {
         switch($choice) {
             case "New Story":
                 $this->story = new Story();
+                $this->title = $this->ask("What is the title of your story?");
+                $this->story->save();
                 break;
                 
             case "New Line":
+                $this->line = new StoryLine();
+                $this->line->text = $this->ask("What is the text for this line?")
+                $this->line->isEnd = $this->confirm("Is this the end of the story?");
+                $this->line->save();
                 break;
             
             case "Back":
-                
+                $this->line = $this->history->pop();
                 break;
                 
             case "Quit":
@@ -84,7 +81,14 @@ class StoryBuilder extends Command
                 break;
                 
             default:
-                $this->story = Story::all()->where("title", $choice)->first();
+                if(!$this->story) {
+                    $this->story = Story::all()->where("title", $choice)->first();
+                } else {
+                    if($this->line) {
+                        $this->history->push($this->line);
+                    }
+                    $this->line = $this->story->startingLines()->where("text", $choice)->first();
+                }
                 break;
         }
     }

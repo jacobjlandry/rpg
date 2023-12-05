@@ -26,23 +26,53 @@ class StoryBuilder extends Command
     private $previousLine = 0; // delete 
     private $line:
     private $history;
-    private $options = ["New", "Back", "Quit"];
+    private $options = ["Back", "Quit"];
+    private $storyOptions = ["New Story"];
+    private $lineOptions = ["New Line"];
     
     public function handle2() 
     {
         $choice = $this->choice(
             "Welcome, traveler!"
             array_merge(
-                array_splice($this->options, 0, 1),
+                $this->storyOptions,
                 Story::all()->pluck("title")->toArray(),
-                areay_splice($this->options, 2, 1),
+                $this->options,
             ),
             0
         );
         
+        $this->handleChoice($choice);
+        
+        if(!$this->story->exists) {
+            $this->story->title = $this->ask("What is this storu called?");
+            $this->story->save();
+        }
+        
+         $choice = $this->choice(
+            "Welcome, traveler!"
+            array_merge(
+                $this->lineOptions,
+                $this->story->startingLines()->pluck("text")->toArray(),
+                $this->options,
+            ),
+            0
+        );
+        
+        $this-handleChoice($choice);
+        
+        if(true) {
+            $this->line = $this->story->startingLines()->where("text", $choice)->first();
+        }
+    }
+    
+    private function handleChoice($choice) {
         switch($choice) {
-            case "New":
+            case "New Story":
                 $this->story = new Story();
+                break;
+                
+            case "New Line":
                 break;
             
             case "Back":
@@ -57,28 +87,6 @@ class StoryBuilder extends Command
             default:
                 $this->story = Story::all()->where("title", $choice)->first();
                 break;
-        }
-        
-        if(!$this->story->exists) {
-            $this->story->title = $this->ask("What is this storu called?");
-            $this->story->save();
-        }
-        
-         $choice = $this->choice(
-            "Welcome, traveler!"
-            array_merge(
-                array_splice($this->options, 0, 1),
-                $this->story->startingLines()->pluck("text")->toArray(),
-                areay_splice($this->options, 1, 2),
-            ),
-            0
-        );
-        
-        // make handlers above func
-        // but need to recognize lines vs story
-        
-        if(true) {
-            $this->line = $this->story->startingLines()->where("text", $choice)->first();
         }
     }
 

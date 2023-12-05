@@ -23,7 +23,64 @@ class StoryBuilder extends Command
     protected $description = 'Build a story in parts';
 
     private $story;
-    private $previousLine = 0;
+    private $previousLine = 0; // delete 
+    private $line:
+    private $history;
+    private $options = ["New", "Back", "Quit"];
+    
+    public function handle2() 
+    {
+        $choice = $this->choice(
+            "Welcome, traveler!"
+            array_merge(
+                array_splice($this->options, 0, 1),
+                Story::all()->pluck("title")->toArray(),
+                areay_splice($this->options, 2, 1),
+            ),
+            0
+        );
+        
+        switch($choice) {
+            case "New":
+                $this->story = new Story();
+                break;
+            
+            case "Back":
+                
+                break;
+                
+            case "Quit":
+                $this->info("Goodbye");
+                return;
+                break;
+                
+            default:
+                $this->story = Story::all()->where("title", $choice)->first();
+                break;
+        }
+        
+        if(!$this->story->exists) {
+            $this->story->title = $this->ask("What is this storu called?");
+            $this->story->save();
+        }
+        
+         $choice = $this->choice(
+            "Welcome, traveler!"
+            array_merge(
+                array_splice($this->options, 0, 1),
+                $this->story->startingLines()->pluck("text")->toArray(),
+                areay_splice($this->options, 1, 2),
+            ),
+            0
+        );
+        
+        // make handlers above func
+        // but need to recognize lines vs story
+        
+        if(true) {
+            $this->line = $this->story->startingLines()->where("text", $choice)->first();
+        }
+    }
 
     /**
      * Execute the console command.

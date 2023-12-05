@@ -24,7 +24,7 @@ class StoryBuilder extends Command
 
     private $story;
     private $previousLine = 0; // delete 
-    private $line:
+    private $line;
     private $history;
     private $storyOptions = ["New Story", "Quit"];
     private $lineOptions = ["New Line", "Back", "Quit"];

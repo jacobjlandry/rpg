@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('story_lines', function (Blueprint $table) {
             $table->id();
-            $table->integer('parent_story_lines');
+            $table->integer('parent_story_line_id');
             $table->string('text');
             $table->boolean('end');
             $table->timestamps();

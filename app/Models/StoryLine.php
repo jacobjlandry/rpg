@@ -13,6 +13,6 @@ class StoryLine extends Model
 
     public function choices()
     {
-        return StoryLine::where('parent_story_line', $this->_id)->get();
+        return StoryLine::where('parent_story_line_id', $this->_id)->get();
     }
 }

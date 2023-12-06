@@ -6,27 +6,28 @@ use Illuminate\Console\Command;
 use App\Models\Story;
 use App\Models\StoryLine;
 
-class StoryBuilder extends Command
+class StoryRunner extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'story:builder';
+    protected $signature = 'story:run';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Build a story in parts';
+    protected $description = 'Run a story';
 
+    /**
+     * Execute the console command.
+     */
     private $story;
     private $line;
     private $history;
-    private $storyOptions = ["New Story", "Quit"];
-    private $lineOptions = ["New Line", "Edit Line", "Back", "Quit"];
     
     public function handle() 
     {
@@ -36,11 +37,7 @@ class StoryBuilder extends Command
         if(!$this->story) {
             $choice = $this->choice(
                 "Choose a story",
-                array_merge(
-                    array_slice($this->storyOptions, 0, 1),
-                    Story::all()->pluck("title")->toArray(),
-                    array_slice($this->storyOptions, 1, 2),
-                ),
+                Story::all()->pluck("title")->toArray(),
                 0
             );
             $this->handleChoice($choice);
@@ -66,11 +63,7 @@ class StoryBuilder extends Command
 
             $choice = $this->choice(
                 "Choose a story line",
-                array_merge(
-                    array_slice($this->lineOptions, 0, 2),
-                    $choices,
-                    array_slice($this->lineOptions, 2, 2),
-                ),
+                $choices,
                 0
             );
             $this->handleChoice($choice);
@@ -84,43 +77,6 @@ class StoryBuilder extends Command
     
     private function handleChoice($choice) {
         switch($choice) {
-            case "New Story":
-                $this->story = new Story();
-                $this->story->title = $this->ask("What is the title of your story?");
-                $this->story->save();
-                break;
-                
-            case "New Line":
-                $line = new StoryLine();
-                $line->story_id = $this->story->_id;
-                $line->parent_story_line_id = isset($this->line) ? $this->line->_id : null;
-                $line->text = $this->ask("What is the text for this line?");
-                $line->isEnd = $this->confirm("Is this the end of the story?");
-                $line->save();
-                break;
-                
-            case "Edit Line":
-                $this->line->text = $this->ask("What is the text for this line?");
-                $this->line->isEnd = $this->confirm("Is this the end of the story?");
-                $this->line->save();
-                break;
-            
-            case "Back":
-                if($this->history->count()) {
-                    $this->line = $this->history->pop();
-                } else if($this->line) {
-                    $this->line = null;
-                } else {
-                    $this->story = null;
-                }
-                
-                break;
-                
-            case "Quit":
-                $this->info("Goodbye");
-                exit;
-                break;
-                
             default:
                 if(!$this->story) {
                     $this->story = Story::all()->where("title", $choice)->first();
@@ -131,7 +87,9 @@ class StoryBuilder extends Command
                     } else {
                         $this->line = $this->story->choices()->where("text", $choice)->first();
                     }
-                    
+                    if($this->line->isEnd || $this->line->choices()->count() == 0) {
+                        exit;
+                    }
                 }
                 break;
         }

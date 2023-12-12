@@ -17,4 +17,13 @@ class Story extends Model
             ->whereNull('parent_story_line_id')
             ->get();
     }
+
+    public function deadEnds()
+    {
+        return StoryLine::where('story_id', $this->_id)
+            ->get()
+            ->filter(function($line) {
+                return $line->choices()->count() === 0 && $line->isEnd === false;
+            });
+    }
 }

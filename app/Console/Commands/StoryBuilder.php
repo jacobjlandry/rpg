@@ -26,7 +26,7 @@ class StoryBuilder extends Command
     private $line;
     private $history;
     private $storyOptions = ["New Story", "Quit"];
-    private $lineOptions = ["New Line", "Edit Line", "Back", "Quit"];
+    private $lineOptions = ["New Line", "Edit Line", "Find Dead Ends", "Back", "Quit"];
     
     public function handle() 
     {
@@ -103,6 +103,15 @@ class StoryBuilder extends Command
                 $this->line->text = $this->ask("What is the text for this line?");
                 $this->line->isEnd = $this->confirm("Is this the end of the story?");
                 $this->line->save();
+                break;
+            
+            case "Find Dead Ends":
+                $newLineText = $this->choice("Choose a line", $this->story->deadEnds()->pluck('text')->toArray(), 0);
+                $newLine = $this->story->deadEnds()->filter(function($line) use($newLineText) { return $line->text === $newLineText; })->first();
+                if($this->line) {
+                    $this->history->push($this->line);
+                }
+                $this->line = $newLine;
                 break;
             
             case "Back":
